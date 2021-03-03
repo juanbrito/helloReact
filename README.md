@@ -1,2 +1,2 @@
-# helloReact
-Hello React Repository - React Application for Recipes Sharing 
+# Hello React App
+Hello React Application - React Application for Recipes Sharing 
