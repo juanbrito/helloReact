@@ -1,28 +1,28 @@
-import ArticleMeta from './ArticleMeta';
+import RecipeMeta from './RecipeMeta';
 import CommentContainer from './CommentContainer';
 import React from 'react';
 import agent from '../../agent';
 import { connect } from 'react-redux';
 import marked from 'marked';
-import { ARTICLE_PAGE_LOADED, ARTICLE_PAGE_UNLOADED } from '../../constants/actionTypes';
+import { RECIPE_PAGE_LOADED, RECIPE_PAGE_UNLOADED } from '../../constants/actionTypes';
 
 const mapStateToProps = state => ({
-  ...state.article,
+  ...state.recipe,
   currentUser: state.common.currentUser
 });
 
 const mapDispatchToProps = dispatch => ({
   onLoad: payload =>
-    dispatch({ type: ARTICLE_PAGE_LOADED, payload }),
+    dispatch({ type: RECIPE_PAGE_LOADED, payload }),
   onUnload: () =>
-    dispatch({ type: ARTICLE_PAGE_UNLOADED })
+    dispatch({ type: RECIPE_PAGE_UNLOADED })
 });
 
-class Article extends React.Component {
+class Recipe extends React.Component {
   componentWillMount() {
     this.props.onLoad(Promise.all([
-      agent.Articles.get(this.props.match.params.id),
-      agent.Comments.forArticle(this.props.match.params.id)
+      agent.Recipes.get(this.props.match.params.id),
+      agent.Comments.forRecipe(this.props.match.params.id)
     ]));
   }
 
@@ -31,22 +31,22 @@ class Article extends React.Component {
   }
 
   render() {
-    if (!this.props.article) {
+    if (!this.props.recipe) {
       return null;
     }
 
-    const markup = { __html: marked(this.props.article.body, { sanitize: true }) };
+    const markup = { __html: marked(this.props.recipe.body, { sanitize: true }) };
     const canModify = this.props.currentUser &&
-      this.props.currentUser.username === this.props.article.author.username;
+      this.props.currentUser.username === this.props.recipe.author.username;
     return (
-      <div className="article-page">
+      <div className="recipe-page">
 
         <div className="banner">
           <div className="container">
 
-            <h1>{this.props.article.title}</h1>
-            <ArticleMeta
-              article={this.props.article}
+            <h1>{this.props.recipe.title}</h1>
+            <RecipeMeta
+              recipe={this.props.recipe}
               canModify={canModify} />
 
           </div>
@@ -54,14 +54,14 @@ class Article extends React.Component {
 
         <div className="container page">
 
-          <div className="row article-content">
+          <div className="row recipe-content">
             <div className="col-xs-12">
 
               <div dangerouslySetInnerHTML={markup}></div>
 
               <ul className="tag-list">
                 {
-                  this.props.article.tagList.map(tag => {
+                  this.props.recipe.tagList.map(tag => {
                     return (
                       <li
                         className="tag-default tag-pill tag-outline"
@@ -78,7 +78,7 @@ class Article extends React.Component {
 
           <hr />
 
-          <div className="article-actions">
+          <div className="recipe-actions">
           </div>
 
           <div className="row">
@@ -94,4 +94,4 @@ class Article extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Article);
+export default connect(mapStateToProps, mapDispatchToProps)(Recipe);
