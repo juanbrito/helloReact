@@ -6,6 +6,7 @@ import { APP_LOAD, REDIRECT } from '../constants/actionTypes';
 import { Route, Switch } from 'react-router-dom';
 import Recipe from '../components/Recipe';
 import Home from '../components/Home';
+import Ratings from '../components/Ratings';
 import Login from '../components/Login';
 import Register from '../components/Register';
 import { store } from '../store';
@@ -56,6 +57,7 @@ class App extends React.Component {
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/recipe/:id" component={Recipe} />
+            <Route path="/ratings" component={Ratings} />
             </Switch>
         </div>
       );

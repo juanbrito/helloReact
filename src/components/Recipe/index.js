@@ -36,6 +36,8 @@ class Recipe extends React.Component {
 
     return <div>
       <div>{this.props.recipe.title}</div>
+      <br/>
+      <div>Pasos</div>
       <div>
         {
           this.props.steps.map(step => {
@@ -47,6 +49,9 @@ class Recipe extends React.Component {
           })
         }
       </div>
+      <br/>
+      <div>Ingredientes</div>
+      <div>Para X Personas</div>
       <div>
         {
           this.props.recipeIngredients.map(ingredientPerPerson => {
