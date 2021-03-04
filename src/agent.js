@@ -37,10 +37,9 @@ const Auth = {
     requests.put('/user', { user })
 };
 
-const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
 const Recipes = {
-  all: page =>
-    requests.get(`/recipes?${limit(20, page)}`),
+  all: (term, sortByStars, sortByStarsAsc) =>
+    requests.get(`/recipes?term=${term}&byStars=${sortByStars}&byStarsAsc=${sortByStarsAsc}}`),
   updateStars: id =>
     requests.put(`/recipes/${id}/stars`),
   get: id =>
