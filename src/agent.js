@@ -51,9 +51,15 @@ const RecipeIngredients = {
     requests.get(`/recipes/${id}/ingredients`)
 };
 
+const RecipeSteps = {
+  forRecipe: id =>
+    requests.get(`/recipes/${id}/steps`)
+};
+
 export default {
   Recipes,
   Auth,
   RecipeIngredients,
+  RecipeSteps,
   setToken: _token => { token = _token; }
 };

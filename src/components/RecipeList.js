@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const RecipeList = props => {
   if (!props.recipes) {
@@ -10,7 +11,7 @@ const RecipeList = props => {
   if (props.recipes.length === 0) {
     return (
       <div className="recipe-preview">
-        No recipes are here... yet.
+        No recipe matching search criteria
       </div>
     );
   }
@@ -20,7 +21,10 @@ const RecipeList = props => {
       {
         props.recipes.map(recipe => {
           return (
-            <div>{recipe.Name}</div>
+            <div key={recipe.title}>
+              <Link to={`/recipe/${recipe.id}`} className="preview-link">{recipe.title}</Link>
+              <div>{recipe.stars}</div>
+            </div>
           );
         })
       }
