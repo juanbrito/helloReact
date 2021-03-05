@@ -24,7 +24,7 @@ const mapDispatchToProps = dispatch => ({
 
 class Ratings extends React.Component {
   componentWillMount() {
-    this.props.onLoad(agent.Recipes.all());
+    this.props.onLoad(agent.Recipes.all(undefined, true));
   }
 
   componentWillUnmount() {
@@ -33,7 +33,10 @@ class Ratings extends React.Component {
 
   render() {
     return (
-      <RecipeList recipes={this.props.recipes} />
+      <div>
+        <div><b>Mejores Recetas</b></div>
+        <RecipeList recipes={this.props.recipes} />
+      </div>
     );
   }
 }

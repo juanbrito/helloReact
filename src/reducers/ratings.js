@@ -8,8 +8,8 @@ export default (state = {}, action) => {
     case RATINGS_PAGE_LOADED:
       return {
         ...state,
-        recipes: action.payload[0].recipes,
-        loading: action.payload[0].recipes
+        recipes: action.payload.recipes,
+        loading: false
       };
     case RATINGS_PAGE_UNLOADED:
       return {};
