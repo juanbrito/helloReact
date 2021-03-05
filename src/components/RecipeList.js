@@ -11,7 +11,7 @@ const RecipeList = props => {
   if (props.recipes.length === 0) {
     return (
       <div className="recipe-preview">
-        No recipe matching search criteria
+        No hay recetas que cumplan el filtro seleccionado
       </div>
     );
   }
