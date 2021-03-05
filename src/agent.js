@@ -38,8 +38,8 @@ const Auth = {
 };
 
 const Recipes = {
-  all: (term, sortByStars, sortByStarsAsc) =>
-    requests.get(`/recipes?term=${term}&byStars=${sortByStars}&byStarsAsc=${sortByStarsAsc}}`),
+  all: (term, sortByStars, byStarsAscDesc) =>
+    requests.get(`/recipes?term=${term}&byStars=${sortByStars}&byStarsAscDesc=${byStarsAscDesc}`),
   updateStars: (id, stars) =>
     requests.put(`/recipes/${id}/stars`, { stars: stars }),
   get: id =>

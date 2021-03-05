@@ -25,8 +25,8 @@ const mapDispatchToProps = dispatch => ({
 class Ratings extends React.Component {
   componentWillMount() {
     this.props.onLoad(Promise.all([
-      agent.Recipes.all(undefined, true, true),
-      agent.Recipes.all(undefined, true, false)
+      agent.Recipes.all(undefined, true, -1),
+      agent.Recipes.all(undefined, true, 1)
     ]))
   }
 
