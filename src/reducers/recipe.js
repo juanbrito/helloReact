@@ -10,7 +10,8 @@ export default (state = {}, action) => {
         ...state,
         recipe: action.payload[0].recipe,
         recipeIngredients: action.payload[1].recipeIngredients,
-        steps: action.payload[2].steps
+        steps: action.payload[2].steps,
+        dinersCount: action.payload[3]
       };
     case RECIPE_PAGE_UNLOADED:
       return {};

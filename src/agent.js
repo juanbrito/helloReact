@@ -47,8 +47,8 @@ const Recipes = {
 };
 
 const RecipeIngredients = {
-  forRecipe: id =>
-    requests.get(`/recipes/${id}/ingredients`)
+  forRecipe: (id, dinersCount) =>
+    requests.get(`/recipes/${id}/ingredients?dinersCount=${dinersCount}`)
 };
 
 const RecipeSteps = {
