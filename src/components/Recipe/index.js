@@ -20,13 +20,33 @@ class Recipe extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {dinersCount: props.dinersCount};
+    this.state = {
+      dinersCount: props.dinersCount ? props.dinersCount : undefined,
+      stars: props.recipe ? props.recipe.stars : undefined // DUNNO WHY THIS IS NOT WORKING
+    };
 
     this.handleDinersCountChange = this.handleDinersCountChange.bind(this);
+    this.handleStarsUpdate = this.handleStarsUpdate.bind(this);
+    this.handleSaveNewStarsForRecipe = this.handleSaveNewStarsForRecipe.bind(this);
   }
 
   handleDinersCountChange(event) {
     this.setState({dinersCount: event.target.value});
+
+    this.props.history.push("/recipe/" + this.props.recipe.id + "/" + event.target.value);
+
+    window.location.reload();
+  }
+
+  handleStarsUpdate(event) {
+    this.setState({stars: event.target.value});
+  }
+
+  handleSaveNewStarsForRecipe(event) {
+    const comp = this;
+    agent.Recipes.updateStars(this.props.recipe.id, this.state.stars).then(function(){
+      comp.props.history.push("/recipe/" + comp.props.recipe.id + "/" + comp.state.dinersCount);
+    })
   }
 
   componentWillMount() {
@@ -47,6 +67,14 @@ class Recipe extends React.Component {
       return null;
     }
 
+    if(this.state.dinersCount == undefined){
+      this.setState({dinersCount: this.props.dinersCount});
+    }
+
+    if(this.state.stars == undefined){
+      this.setState({stars: this.props.recipe.stars});
+    }
+
     return <div>
       <div><b>{this.props.recipe.title}</b></div>
       <br/>
@@ -64,8 +92,8 @@ class Recipe extends React.Component {
       </div>
       <br/>
       <div><b>Ingredientes</b></div>
-      <div class="form-inline">
-        <span>Para <input type="text" style={{'vertical-align': 'top'}} value={this.state.dinersCount} onChange={this.handleDinersCountChange}/> Personas</span>
+      <div className="form-inline">
+        <span>Para <input type="text" style={{'verticalAlign': 'top'}} value={this.state.dinersCount} onChange={this.handleDinersCountChange}/> Personas</span>
       </div>
       <div>
         {
@@ -79,6 +107,13 @@ class Recipe extends React.Component {
             );
           })
         }
+      </div>
+      <br/>
+      <br/>
+      <div>
+        <div>Actualizar puntuación</div>
+        <input type="text" style={{'verticalAlign': 'top'}} value={this.state.stars} placeholder="Cantidad de estrellas (1...5)" onChange={this.handleStarsUpdate}/>
+        <span className="btn btn-primary" onClick={this.handleSaveNewStarsForRecipe}>Guardar</span>
       </div>
     </div>;
   }
