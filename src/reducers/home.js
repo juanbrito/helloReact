@@ -4,7 +4,9 @@ export default (state = {}, action) => {
   switch (action.type) {
     case HOME_PAGE_LOADED:
       return {
-        ...state
+        ...state,
+        recipes: action.payload[0].recipes,
+        searchTerm: action.payload[1]
       };
     case HOME_PAGE_UNLOADED:
       return {};

@@ -22,8 +22,8 @@ const RecipeList = props => {
         props.recipes.map(recipe => {
           return (
             <div key={recipe.title}>
-              <Link to={`/recipe/${recipe.id}`} className="preview-link">{recipe.title}</Link>
-              <div>{recipe.stars}</div>
+              <Link to={`/recipe/${recipe.id}/1`} className="preview-link">{recipe.title}</Link>
+              <span> - {recipe.stars} Stars</span>
             </div>
           );
         })
