@@ -1,50 +1,35 @@
 import React from 'react';
 import agent from '../../agent';
-import { connect } from 'react-redux';
 import RecipeList from '../RecipeList';
-import {
-  RATINGS_PAGE_LOADED,
-  RATINGS_PAGE_UNLOADED
-} from '../../constants/actionTypes';
 
 const Promise = global.Promise;
 
-const mapStateToProps = state => ({
-  ...state.ratings,
-  appName: state.common.appName,
-  token: state.common.token
-});
-
-const mapDispatchToProps = dispatch => ({
-  onLoad: (payload) =>
-    dispatch({ type: RATINGS_PAGE_LOADED, payload }),
-  onUnload: () =>
-    dispatch({  type: RATINGS_PAGE_UNLOADED })
-});
-
 class Ratings extends React.Component {
-  componentWillMount() {
-    this.props.onLoad(Promise.all([
-      agent.Recipes.all(undefined, true, -1),
-      agent.Recipes.all(undefined, true, 1)
-    ]))
+  constructor() {
+    super();
+    this.state = {bestRecipes: [], worstRecipes: []};
   }
 
-  componentWillUnmount() {
-    this.props.onUnload();
+  componentWillMount() {
+    agent.Recipes.all(undefined, true, -1).then(data => {
+      this.setState({bestRecipes: data.recipes}) 
+    })
+    agent.Recipes.all(undefined, true, 1).then(data => {
+      this.setState({worstRecipes: data.recipes}) 
+    })
   }
 
   render() {
     return (
       <div>
         <div><b>Mejores Recetas</b></div>
-        <RecipeList recipes={this.props.bestRecipes} />
+        <RecipeList recipes={this.state.bestRecipes} />
         <br/>
         <div><b>Peores Recetas</b></div>
-        <RecipeList recipes={this.props.worstRecipes} />
+        <RecipeList recipes={this.state.worstRecipes} />
       </div>
     );
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Ratings);
+export default Ratings;

@@ -1,28 +1,14 @@
 import React from 'react';
 import agent from '../../agent';
-import { connect } from 'react-redux';
 import marked from 'marked';
-import { RECIPE_PAGE_LOADED, RECIPE_PAGE_UNLOADED } from '../../constants/actionTypes';
-
-const mapStateToProps = state => ({
-  ...state.recipe,
-  currentUser: state.common.currentUser
-});
-
-const mapDispatchToProps = dispatch => ({
-  onLoad: payload =>
-    dispatch({ type: RECIPE_PAGE_LOADED, payload }),
-  onUnload: () =>
-    dispatch({ type: RECIPE_PAGE_UNLOADED }),
-});
 
 class Recipe extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      dinersCount: props.dinersCount ? props.dinersCount : undefined,
-      stars: props.recipe ? props.recipe.stars : undefined // DUNNO WHY THIS IS NOT WORKING
+      dinersCount: this.props.match.params.dinersCount ? this.props.match.params.dinersCount : 1,
+      recipe: undefined
     };
 
     this.handleDinersCountChange = this.handleDinersCountChange.bind(this);
@@ -33,7 +19,7 @@ class Recipe extends React.Component {
   handleDinersCountChange(event) {
     this.setState({dinersCount: event.target.value});
 
-    this.props.history.push("/recipe/" + this.props.recipe.id + "/" + event.target.value);
+    this.props.history.push("/recipe/" + this.state.recipe.id + "/" + event.target.value);
 
     window.location.reload();
   }
@@ -44,72 +30,73 @@ class Recipe extends React.Component {
 
   handleSaveNewStarsForRecipe(event) {
     const comp = this;
-    agent.Recipes.updateStars(this.props.recipe.id, this.state.stars).then(function(){
-      comp.props.history.push("/recipe/" + comp.props.recipe.id + "/" + comp.state.dinersCount);
+    agent.Recipes.updateStars(this.state.recipe.id, this.state.stars).then(function(){
+      comp.props.history.push("/recipe/" + comp.state.recipe.id + "/" + comp.state.dinersCount);
     })
   }
 
   componentWillMount() {
-    this.props.onLoad(Promise.all([
-      agent.Recipes.get(this.props.match.params.id),
-      agent.RecipeIngredients.forRecipe(this.props.match.params.id, this.props.match.params.dinersCount !== 'undefined' ? this.props.match.params.dinersCount : 1),
-      agent.RecipeSteps.forRecipe(this.props.match.params.id),
-      Promise.resolve(this.props.match.params.dinersCount !== 'undefined' ? this.props.match.params.dinersCount : 1)
-    ]));
-  }
-
-  componentWillUnmount() {
-    this.props.onUnload();
+    agent.Recipes.get(this.props.match.params.id).then(data => {
+      this.setState({recipe: data.recipe}) 
+      this.setState({stars: data.recipe.stars}) 
+    })
+    agent.RecipeIngredients.forRecipe(this.props.match.params.id, this.state.dinersCount).then(data => {
+      this.setState({recipeIngredients: data.recipeIngredients}) 
+    })
+    agent.RecipeSteps.forRecipe(this.props.match.params.id).then(data => {
+      this.setState({steps: data.steps}) 
+    })
   }
 
   render() {
-    if (!this.props.recipe) {
-      return null;
-    }
-
-    if(this.state.dinersCount == undefined){
-      this.setState({dinersCount: this.props.dinersCount});
-    }
-
-    if(this.state.stars == undefined){
-      this.setState({stars: this.props.recipe.stars});
+    if (this.state.recipe == null) {
+      return null
     }
 
     return <div>
-      <div><b>{this.props.recipe.title}</b></div>
+      <div><b>{this.state.recipe.title}</b></div>
       <br/>
-      <div><b>Pasos</b></div>
-      <div>
-        {
-          this.props.steps.map(step => {
-            return (
-              <div key={step}>
-                <div>{step}</div>
-              </div>
-            );
-          })
-        }
-      </div>
-      <br/>
-      <div><b>Ingredientes</b></div>
-      <div className="form-inline">
-        <span>Para <input type="text" style={{'verticalAlign': 'top'}} value={this.state.dinersCount} onChange={this.handleDinersCountChange}/> Personas</span>
-      </div>
-      <div>
-        {
-          this.props.recipeIngredients.map(ingredientPerPerson => {
-            return (
-              <div key={ingredientPerPerson.name}>
-                <span>{ingredientPerPerson.name} </span>
-                <span>{ingredientPerPerson.amount} </span>
-                <span>{ingredientPerPerson.amountUnit}</span>
-              </div>
-            );
-          })
-        }
-      </div>
-      <br/>
-      <br/>
+      {
+        this.state.steps != null &&
+          <div>
+            <b>Pasos</b>
+            <div>
+              {
+                this.state.steps.map(step => {
+                  return (
+                    <div key={step}>
+                      <div>{step}</div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+            <br/>
+          </div>
+      }
+      {this.state.recipeIngredients != null &&
+        <div>
+          <b>Ingredientes</b>
+          <div className="form-inline">
+            <span>Para <input type="text" style={{'verticalAlign': 'top'}} value={this.state.dinersCount} onChange={this.handleDinersCountChange}/> Personas</span>
+          </div>
+          <div>
+            {
+              this.state.recipeIngredients.map(ingredientPerPerson => {
+                return (
+                  <div key={ingredientPerPerson.name}>
+                    <span>{ingredientPerPerson.name} </span>
+                    <span>{ingredientPerPerson.amount} </span>
+                    <span>{ingredientPerPerson.amountUnit}</span>
+                  </div>
+                );
+              })
+            }
+          </div>
+          <br/>
+          <br/>
+        </div>
+      }
       <div>
         <div>Actualizar puntuación</div>
         <input type="text" style={{'verticalAlign': 'top'}} value={this.state.stars} placeholder="Cantidad de estrellas (1...5)" onChange={this.handleStarsUpdate}/>
@@ -119,4 +106,4 @@ class Recipe extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Recipe);
+export default Recipe;
