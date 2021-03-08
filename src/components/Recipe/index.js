@@ -1,6 +1,5 @@
 import React from 'react';
 import agent from '../../agent';
-import marked from 'marked';
 import Ingredients from './ingredients'
 import Steps from './steps'
 
@@ -46,7 +45,7 @@ class Recipe extends React.Component {
     })
   }
 
-  componentWillMount() {
+  componentDidMount() {
     agent.Recipes.get(this.props.match.params.id).then(data => {
       this.setState({recipe: data.recipe}, () => 
         this.setState({stars: data.recipe.stars}, () =>

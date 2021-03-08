@@ -1,4 +1,3 @@
-import agent from '../agent';
 import Header from './Header';
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';

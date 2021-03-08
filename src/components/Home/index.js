@@ -14,7 +14,7 @@ class Home extends React.Component {
     this.setState({searchTerm: event.target.value});
   }
 
-  componentWillMount() {
+  componentDidMount() {
     agent.Recipes.all(this.state.searchTerm).then(data => {
       this.setState({recipes: data.recipes}) 
     })

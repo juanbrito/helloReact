@@ -2,15 +2,13 @@ import React from 'react';
 import agent from '../../agent';
 import RecipeList from '../RecipeList';
 
-const Promise = global.Promise;
-
 class Ratings extends React.Component {
   constructor() {
     super();
     this.state = {bestRecipes: [], worstRecipes: []};
   }
 
-  componentWillMount() {
+  componentDidMount() {
     agent.Recipes.all(undefined, true, -1).then(data => {
       this.setState({bestRecipes: data.recipes}) 
     })
