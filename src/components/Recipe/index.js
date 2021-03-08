@@ -1,6 +1,8 @@
 import React from 'react';
 import agent from '../../agent';
 import marked from 'marked';
+import Ingredients from './ingredients'
+import Steps from './steps'
 
 class Recipe extends React.Component {
   constructor(props) {
@@ -8,7 +10,12 @@ class Recipe extends React.Component {
 
     this.state = {
       dinersCount: this.props.match.params.dinersCount ? this.props.match.params.dinersCount : 1,
-      recipe: undefined
+      recipeLoaded: false,
+      ingredientsLoaded: false,
+      stepsLoaded: false,
+      recipe: undefined,
+      recipeIngredients: [],
+      steps: []
     };
 
     this.handleDinersCountChange = this.handleDinersCountChange.bind(this);
@@ -17,11 +24,10 @@ class Recipe extends React.Component {
   }
 
   handleDinersCountChange(event) {
-    this.setState({dinersCount: event.target.value});
-
-    this.props.history.push("/recipe/" + this.state.recipe.id + "/" + event.target.value);
-
-    window.location.reload();
+    this.setState({dinersCount: event.target.value}, () => {
+      this.updateIngredients()
+      this.props.history.push("/recipe/" + this.state.recipe.id + "/" + this.state.dinersCount);
+    });
   }
 
   handleStarsUpdate(event) {
@@ -29,74 +35,50 @@ class Recipe extends React.Component {
   }
 
   handleSaveNewStarsForRecipe(event) {
-    const comp = this;
-    agent.Recipes.updateStars(this.state.recipe.id, this.state.stars).then(function(){
-      comp.props.history.push("/recipe/" + comp.state.recipe.id + "/" + comp.state.dinersCount);
+    agent.Recipes.updateStars(this.state.recipe.id, this.state.stars)
+  }
+
+  updateIngredients(){
+    agent.RecipeIngredients.forRecipe(this.props.match.params.id, this.state.dinersCount).then(data => {
+      this.setState({recipeIngredients: data.recipeIngredients}, () => {
+        this.setState({ingredientsLoaded: true})
+      })
     })
   }
 
   componentWillMount() {
     agent.Recipes.get(this.props.match.params.id).then(data => {
-      this.setState({recipe: data.recipe}) 
-      this.setState({stars: data.recipe.stars}) 
+      this.setState({recipe: data.recipe}, () => 
+        this.setState({stars: data.recipe.stars}, () =>
+          this.setState({recipeLoaded: true}) 
+        )   
+      ) 
     })
-    agent.RecipeIngredients.forRecipe(this.props.match.params.id, this.state.dinersCount).then(data => {
-      this.setState({recipeIngredients: data.recipeIngredients}) 
-    })
+    this.updateIngredients()
     agent.RecipeSteps.forRecipe(this.props.match.params.id).then(data => {
-      this.setState({steps: data.steps}) 
+      this.setState({steps: data.steps}, () => 
+        this.setState({stepsLoaded: true}) 
+      ) 
     })
   }
 
   render() {
-    if (this.state.recipe == null) {
-      return null
+    if (!this.state.recipeLoaded) {
+      return <div>
+        Loading...
+      </div>
     }
 
     return <div>
       <div><b>{this.state.recipe.title}</b></div>
       <br/>
       {
-        this.state.steps != null &&
-          <div>
-            <b>Pasos</b>
-            <div>
-              {
-                this.state.steps.map(step => {
-                  return (
-                    <div key={step}>
-                      <div>{step}</div>
-                    </div>
-                  );
-                })
-              }
-            </div>
-            <br/>
-          </div>
+        this.state.stepsLoaded &&
+          <Steps steps={this.state.steps}/>
       }
-      {this.state.recipeIngredients != null &&
-        <div>
-          <b>Ingredientes</b>
-          <div className="form-inline">
-            <span>Para <input type="text" style={{'verticalAlign': 'top'}} value={this.state.dinersCount} onChange={this.handleDinersCountChange}/> Personas</span>
-          </div>
-          <div>
-            {
-              this.state.recipeIngredients.map(ingredientPerPerson => {
-                return (
-                  <div key={ingredientPerPerson.name}>
-                    <span>{ingredientPerPerson.name} </span>
-                    <span>{ingredientPerPerson.amount} </span>
-                    <span>{ingredientPerPerson.amountUnit}</span>
-                  </div>
-                );
-              })
-            }
-          </div>
-          <br/>
-          <br/>
-        </div>
-      }
+      {this.state.ingredientsLoaded &&
+          <Ingredients ingredients={this.state.recipeIngredients} dinersCount={this.state.dinersCount} handleDinersCountChange={this.handleDinersCountChange}/>
+      } 
       <div>
         <div>Actualizar puntuación</div>
         <input type="text" style={{'verticalAlign': 'top'}} value={this.state.stars} placeholder="Cantidad de estrellas (1...5)" onChange={this.handleStarsUpdate}/>
